@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Inter:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #ffffff;
+            --bg: #fafafa;
             --fg: #000000;
         }
         body {
@@ -21,11 +21,19 @@
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
         }
+        h1, h2, h3, h4, .heading-archivo {
+            font-family: 'Archivo', sans-serif;
+            text-transform: uppercase;
+        }
+        .heading-syne {
+            font-family: 'Syne', sans-serif;
+            text-transform: uppercase;
+        }
         .mono {
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'JetBrains Mono', monospace;
         }
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         ::-webkit-scrollbar-track {
             background: var(--bg);
@@ -33,15 +41,21 @@
         ::-webkit-scrollbar-thumb {
             background: var(--fg);
         }
-        @keyframes pan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(400%); }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-        .animate-pan {
-            animation: pan 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-        .touch-action-none {
-            touch-action: none;
+        @keyframes mri-scan {
+            0% { top: 0; opacity: 0.2; }
+            50% { top: 100%; opacity: 0.8; }
+            100% { top: 0; opacity: 0.2; }
+        }
+        ::selection {
+          background-color: #000;
+          color: #fff;
         }
     </style>
 <script type="importmap">
@@ -55,10 +69,8 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
-<body class="overflow-x-hidden selection:bg-black selection:text-white">
+<body class="overflow-x-hidden">
     <div id="root"></div>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>

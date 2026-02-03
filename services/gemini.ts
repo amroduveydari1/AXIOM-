@@ -1,15 +1,9 @@
 
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { LogoMetrics, AnalysisResponse } from "../types";
 
 export const analyzeLogoStructure = async (metrics: LogoMetrics): Promise<AnalysisResponse> => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  
-  if (!apiKey) {
-    throw new Error('GEMINI_API_KEY not configured. Please add your API key to .env file.');
-  }
-  
-  const ai = new GoogleGenerativeAI(apiKey);
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
   
   const prompt = `
     Perform a deep forensic deconstruction of this visual artifact using the provided Euclidean metrics.
@@ -31,38 +25,38 @@ export const analyzeLogoStructure = async (metrics: LogoMetrics): Promise<Analys
     Strict JSON output only.
   `;
 
-  const model = ai.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp',
-    systemInstruction: "You are the AXIOM Forensic Interface. You analyze visual structures with the cold precision of a structural engineer. You provide objective design diagnostics based on mathematical weight distribution and market grounding.",
-    generationConfig: {
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: prompt,
+    config: {
+      systemInstruction: "You are the AXIOM Core Intelligence. You analyze visual structures with the cold precision of a structural engineer. You provide objective design diagnostics based on mathematical weight distribution and market grounding. You avoid fluff and flowery language.",
+      tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
       responseSchema: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
-          structural_summary: { type: SchemaType.STRING, description: "A forensic overview of the artifact's formal integrity." },
-          balance_analysis: { type: SchemaType.STRING, description: "Detailed critique of the volumetric load distribution." },
-          geometry_analysis: { type: SchemaType.STRING, description: "Assessment of the bounding box efficiency and aspect ratio." },
-          alignment_analysis: { type: SchemaType.STRING, description: "Analysis of centroid displacement and axial nodes." },
-          market_context: { type: SchemaType.STRING, description: "Grounding report on current visual industry standards." },
+          structural_summary: { type: Type.STRING, description: "A forensic overview of the artifact's formal integrity." },
+          balance_analysis: { type: Type.STRING, description: "Detailed critique of the volumetric load distribution." },
+          geometry_analysis: { type: Type.STRING, description: "Assessment of the bounding box efficiency and aspect ratio." },
+          alignment_analysis: { type: Type.STRING, description: "Analysis of centroid displacement and axial nodes." },
+          market_context: { type: Type.STRING, description: "Grounding report on current visual industry standards." },
           remedial_actions: { 
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
             description: "Three specific architectural adjustments."
           },
-          score: { type: SchemaType.NUMBER, description: "Structural Harmony Index (0-100)." }
+          score: { type: Type.NUMBER, description: "Structural Harmony Index (0-100)." }
         },
         required: ["structural_summary", "balance_analysis", "geometry_analysis", "alignment_analysis", "market_context", "remedial_actions", "score"]
       }
     }
   });
 
-  const response = await model.generateContent(prompt);
-
-  const text = response.response.text() || '{}';
-  const groundingChunks = response.response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+  const text = response.text || '{}';
+  const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
   const groundingUrls = groundingChunks
-    .filter((chunk: any) => chunk.web)
-    .map((chunk: any) => ({ title: chunk.web!.title, uri: chunk.web!.uri }));
+    .filter(chunk => chunk.web)
+    .map(chunk => ({ title: chunk.web!.title, uri: chunk.web!.uri }));
 
   try {
     const data = JSON.parse(text) as AnalysisResponse;
